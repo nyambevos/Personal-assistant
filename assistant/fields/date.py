@@ -7,7 +7,7 @@ class Date(Field):
         try:
             birthday = datetime.strptime(value, "%Y-%m-%d").date()
             if date.today() < birthday:
-                return False
+                raise ValueError
             return True
         except ValueError:
-            return False
+            raise ValueError("Incorrect date of birth")
