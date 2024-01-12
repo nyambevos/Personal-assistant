@@ -3,4 +3,7 @@
 from assistant.fields import Field
 
 class Phone(Field):
-    pass
+    def is_valid(self, value):
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError("Incorrect phone number")
+        return True
