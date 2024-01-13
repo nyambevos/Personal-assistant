@@ -1,6 +1,75 @@
 """ Модуль роботи з нотаткою """
 
+from datetime import datetime
 from assistant.fields import Title, Text, Tag, Date
 
+
 class Note:
-    pass
+    """ This class implements the functionality of a note.
+        Accepts values: title, text, tags. """
+    def __init__(self, title:str, text:str, tag:str) -> None:
+        # 
+        self._title = Title(title)
+        self._text = Text(text)
+        self._tags = [Tag(tag)]
+        self._creation_date = datetime.now()
+
+    @property
+    def title(self) -> Title:
+        return self._title
+    
+    @title.setter
+    def title(self, title) -> None:
+        self._title = Title(title)
+
+    @property
+    def text(self) -> Text:
+        return self._text
+    
+    @text.setter
+    def text(self, text) -> None:
+        self._text = Text(text)
+
+    @property
+    def creation_date(self) -> Date:
+        return self._creation_date
+    
+    @property
+    def tags(self) -> set:
+        return self._tags
+
+
+    def add_tag(self, tag:str) -> None:
+        """The method adds a new tag to the tag list"""
+        tg = self.find_tag(tag=tag)
+        if not tg:
+            self._tags.append(Tag(tag))
+        else:
+            raise IndexError(f"{tag} tag already exists.")
+
+    def remove_tag(self, tag:str) -> None:
+        """Method removes a tag from the tag list"""
+        tg = self.find_tag(tag=tag)
+
+        if tg:
+            self._tags.remove(tg)
+        else:
+            raise IndexError(f"Tag {tag} does not exist")
+        
+    def find_tag(self, tag:str) -> Tag:
+        """ he method searches for the desired tag.
+            If it finds it, it returns it."""
+        tg = list(filter(lambda tg: tg.value == tag, self._tags))
+
+        if tg:
+            return tg[0]
+        
+    def change_tag(self, old_tag:str, new_tag:str):
+        """The method replaces the required tag with a new one."""
+        tg = self.find_tag(tag=old_tag)
+
+        if tg:
+            self._tags.remove(tg)
+            self._tags.append(Tag(new_tag))
+        else:
+            raise IndexError(f"Tag {old_tag} does not exist")

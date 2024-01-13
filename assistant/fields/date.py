@@ -1,6 +1,7 @@
 """ Модуль поля дати дня народження """
 
 from assistant.fields import Field
+from datetime import datetime, date
 
 class Date(Field):
     def is_valid(self, value):
