@@ -1,10 +1,7 @@
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-from assistant.fields.date import Date
-
-from assistant.fields.phone import Phone
-from assistant.fields.email_address import EmailAddress
-
+from termcolor import colored
+from assistant.fields import *
 
 """ Модуль персонального асистента """
 
@@ -48,7 +45,7 @@ def command_handler(command, description):
             try:
                 return func(self)
             except ValueError as err:
-                return err
+                return colored(err, "red")
         commands[command] = (wrapper, description)
         return wrapper
     return input_error
@@ -66,7 +63,7 @@ class Assistant:
                     return None
                 return cls(inp)
             except ValueError as err:
-                print(err)
+                print(colored(err, "red"))
 
     @command_handler("help", "Help")
     def help(self):
@@ -87,7 +84,7 @@ class Assistant:
 
     @command_handler("add", "Add new user to contact book")
     def add_command(self):
-        name = prompt("User name: ").strip()
+        name = self.validated_input(Name, "User name: ")
         phone = self.validated_input(Phone, "User phone, empty to skip: ")
         email = self.validated_input(
             EmailAddress,
@@ -98,7 +95,43 @@ class Assistant:
             f"Phone: {phone}\n"\
             f"E-mail: {email}\n"\
             f"Birthday: {birthday}"
+    
+    @command_handler("remove", "Remove user from contact book")
+    def remove_command(self):
+        return "This is command placeholder"
+    
+    @command_handler("phone", "Add phone number to existing user")
+    def phone_command(self):
+        return "This is command placeholder"
+    
+    @command_handler("edit", "Edit existing user")
+    def edit_command(self):
+        return "This is command placeholder"
+    
+    @command_handler("search", "Search by pattern in any record")
+    def search_command(self):
+        return "This is command placeholder"
+    
+    @command_handler("show", "Show all records in contact book")
+    def show_command(self):
+        return "This is command placeholder"
+    
+    @command_handler("note", "Add note no notes book")
+    def note_command(self):
+        return "This is command placeholder for notes"
+    
+    @command_handler("remove note", "Remove note from notes book")
+    def rm_note_command(self):
+        return "This is command placeholder for notes"
+    
+    @command_handler("sort folder", "Smart file sorter")
+    def sort_command(self):
+        return "This is command placeholder"
 
+    @command_handler("birthday", "Birthday persons list to specific date")
+    def birthday_command(self):
+        return "This is command placeholder"
+    
     def main_loop(self):
         print(self.help())
         while self.running:
