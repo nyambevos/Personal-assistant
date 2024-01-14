@@ -5,8 +5,7 @@ from assistant.fields import EmailAddress, Name, Phone
 
 
 class Contact:
-
-    def __init__(self, name:str):
+    def __init__(self, name: str):
         self._name = Name(name)
         self._phones = []
         self._address = None
@@ -49,22 +48,26 @@ class Contact:
     def birthday(self, birthday):
         self._birthday = Date(birthday)
 
-    def add_phone(self, phone):
-        if phone in self._phones:
-            raise IndexError(f"Phone {phone} is already in phone numbers list")
-        else:
-            self._phones.append(Phone(phone))
+    def add_phone(self, new_phone):
+        for phone in self._phones:
+            if phone.value == new_phone:
+                raise IndexError(f"Phone {new_phone} is already in phone numbers list")
+        self._phones.append(Phone(new_phone))
 
-    def edit_phone(self, phone, new_phone):
-        if new_phone in self._phones:
-            raise IndexError(f"Phone {new_phone} is already in phone numbers list")
-        elif phone in self._phones:
-            self._phones[self._phones.index(phone)] = new_phone
-        else:
-            raise IndexError(f"There is no such phone {phone} in phone numbers list")
+    def edit_phone(self, old_phone, new_phone):
+        for phone in self._phones:
+            if new_phone == phone.value:
+                raise IndexError(f"Phone {new_phone} is already in phone numbers list")
+            elif old_phone == phone.value:
+                self._phones[self._phones.index(phone)] = Phone(new_phone)
+                break
+            else:
+                raise IndexError(f"There is no such phone {old_phone} in phone numbers list")
 
-    def remove_phone(self, phone):
-        if phone in self._phones:
-            self._phones.remove(phone)
+    def remove_phone(self, old_phone):
+        for phone in self._phones:
+            if phone.value == old_phone:
+                self._phones.remove(phone)
+                break
         else:
-            raise IndexError(f"There is no such phone {phone} in phone numbers list")
+            raise IndexError(f"There is no such phone {old_phone} in phone numbers list")
