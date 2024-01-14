@@ -150,7 +150,7 @@ class Assistant:
     @command_handler("list", "List all commands")
     def list_command(self):
         return "\n".join(
-            f"{command: <10}{val[1]}" for command, val in commands.items()
+            f"{command: <17}{val[1]}" for command, val in commands.items()
         )
 
     @command_handler("exit", "Exit")
@@ -243,7 +243,7 @@ class Assistant:
         note.remove_tag(tag.value)
         return "Note has been updated"
     
-    @command_handler("note edit tag", "Remove tag from note")
+    @command_handler("note edit tag", "Edit note tag")
     def rm_tag_command(self):
         title = self.validated_input(
             Title,
@@ -269,6 +269,14 @@ class Assistant:
         )
         self.notes_book.delete(title.value)
         return f"Note with title {title} has been removed"
+    
+    @command_handler("note search", "Notes search by pattern")
+    def rm_note_command(self):
+        pattern = prompt("Search: ").strip()
+        result = self.notes_book.find(pattern)
+        if not result:
+            return "Nothing found"
+        return "\n\n".join(str(note) for note in result)
         
     
     @command_handler("sort folder", "Smart file sorter")
