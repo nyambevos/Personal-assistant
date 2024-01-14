@@ -1,5 +1,7 @@
 """ Модуль роботи з контактом """
 
+
+from colored import Fore, Style
 from assistant.fields import Address, Date
 from assistant.fields import EmailAddress, Name, Phone
 
@@ -51,23 +53,45 @@ class Contact:
     def add_phone(self, new_phone):
         for phone in self._phones:
             if phone.value == new_phone:
-                raise IndexError(f"Phone {new_phone} is already in phone numbers list")
+                raise IndexError(
+                    f"Phone {new_phone} is already in phone numbers list"
+                )
         self._phones.append(Phone(new_phone))
 
     def edit_phone(self, old_phone, new_phone):
         for phone in self._phones:
             if new_phone == phone.value:
-                raise IndexError(f"Phone {new_phone} is already in phone numbers list")
+                raise IndexError(
+                    f"Phone {new_phone} is already in phone numbers list"
+                )
             elif old_phone == phone.value:
                 self._phones[self._phones.index(phone)] = Phone(new_phone)
-                break
-            else:
-                raise IndexError(f"There is no such phone {old_phone} in phone numbers list")
+                return
+        raise IndexError(
+            f"There is no such phone {old_phone} in phone numbers list"
+        )
 
     def remove_phone(self, old_phone):
         for phone in self._phones:
             if phone.value == old_phone:
                 self._phones.remove(phone)
-                break
-        else:
-            raise IndexError(f"There is no such phone {old_phone} in phone numbers list")
+                return
+        raise IndexError(
+            f"There is no such phone {old_phone} in phone numbers list"
+        )
+
+    @property
+    def phones_tuple(self) -> set:
+        return tuple(phone.value for phone in self._phones)
+
+    def __str__(self):
+        return f"{Fore.yellow}{self.name}\n{Style.reset}"\
+            f"{'':-<20}\n"\
+            f"{Fore.rgb(255, 255, 255)}Phones: {Style.reset}"\
+            f"{', '.join(tuple(phone.value for phone in self.phones))}\n"\
+            f"{Fore.rgb(255, 255, 255)}Address: {Style.reset}"\
+            f"{self.address}\n"\
+            f"{Fore.rgb(255, 255, 255)}E-mail: {Style.reset}"\
+            f"{self.email}\n"\
+            f"{Fore.rgb(255, 255, 255)}Birthday: {Style.reset}"\
+            f"{self.birthday}\n"
