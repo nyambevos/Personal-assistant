@@ -5,7 +5,8 @@ from colored import Fore, Style
 from assistant.fields import *
 from assistant.records import *
 from assistant.notes_book import NoteBook
-import textwrap
+from assistant.utils.data_handler import *
+# import textwrap
 
 """ Модуль персонального асистента """
 
@@ -130,16 +131,21 @@ class Assistant:
 
 
     @staticmethod
-    def validated_input(cls, request, completer = None):
+    def validated_input(cls, request, completer = None, allow_empty = False):
         inp_completer = WordCompleter(completer) if completer else None
         while True:
             try:
                 inp = prompt(request, completer=inp_completer).strip()
-                if not inp:
+                if not inp and allow_empty:
                     return None
+                if not inp:
+                    raise ValueError("Input can't be empty")
                 return cls(inp)
             except (ValueError, IndexError) as err:
                 print(f"{Fore.red}{err}{Style.reset}")
+
+    def save(self):
+        pass
 
     @command_handler("help", "Help")
     def help(self):
@@ -161,12 +167,20 @@ class Assistant:
     @command_handler("add", "Add new user to contact book")
     def add_command(self):
         name = self.validated_input(Name, "User name: ")
-        phone = self.validated_input(Phone, "User phone, empty to skip: ")
+        phone = self.validated_input(
+            Phone,
+            "User phone, empty to skip: ",
+            allow_empty=True)
         email = self.validated_input(
             EmailAddress,
-            "User e-mail, empty to skip: "
+            "User e-mail, empty to skip: ",
+            allow_empty=True
         )
-        birthday = self.validated_input(Date, "User birthday, empty to skip: ")
+        birthday = self.validated_input(
+            Date,
+            "User birthday, empty to skip: ",
+            allow_empty=True
+        )
         return f"New user {name} has been added\n"\
             f"Phone: {phone}\n"\
             f"E-mail: {email}\n"\
