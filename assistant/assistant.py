@@ -5,6 +5,7 @@ from colored import Fore, Style
 from assistant.fields import *
 from assistant.records import *
 from assistant.notes_book import NoteBook
+from assistant.contact_book import ContactBook
 from assistant.utils.data_handler import *
 # import textwrap
 
@@ -29,7 +30,7 @@ from assistant.utils.data_handler import *
 
 commands = {}
 
-contact_book=[]
+tmp_contact_book=[]
 
 contact = Contact("Madilyn")
 contact.add_phone("3569321443")
@@ -38,7 +39,7 @@ contact.add_phone("7922432903")
 contact.birthday = "2002-07-07"
 contact.email = "example@email.com"
 contact.address = "5780 Kozey Garden, West Margeneville, OK 65613"
-contact_book.append(contact)
+tmp_contact_book.append(contact)
 
 contact = Contact("Roland")
 contact.add_phone("5246670975")
@@ -46,16 +47,16 @@ contact.add_phone("1662428392")
 contact.birthday = "1993-09-20"
 contact.email = "example2@email.com"
 contact.address = "573 Jones Forest, Port Nelida, AK 66734"
-contact_book.append(contact)
+tmp_contact_book.append(contact)
 
 contact = Contact("Julia")
 contact.add_phone("1962802250")
 contact.add_phone("9276019428")
 contact.add_phone("5244315630")
 contact.birthday = "1988-08-26"
-contact.email = "example@email.com"
+contact.email = "example3@email.com"
 contact.address = "Suite 787 7328 Krajcik Bypass, New Jesston, WY 7362-91147"
-contact_book.append(contact)
+tmp_contact_book.append(contact)
 
 
 # command handler decorator to handle commands automaticaly
@@ -87,12 +88,14 @@ def command_handler(command, description):
 class Assistant:
     def __init__(self) -> None:
         self.running = True
+        self.contact_book = ContactBook()
         self.notes_book = NoteBook()
 
         # remove me!
-        # for note in tmp_notes_book:
-        #     self.notes_book.add_record(note)
-
+        for contact in tmp_contact_book:
+            self.contact_book.add_contact(contact)
+        
+        print(self.contact_book)
 
     @staticmethod
     def validated_input(cls, request, completer = None, allow_empty = False):
@@ -134,44 +137,189 @@ class Assistant:
     @command_handler("add", "Add new user to contact book")
     def add_command(self):
         name = self.validated_input(Name, "User name: ")
+        contact = Contact(name.value)
+        self.contact_book.add_contact(contact)
         phone = self.validated_input(
             Phone,
             "User phone, empty to skip: ",
             allow_empty=True)
+        if phone:
+            contact.add_phone(phone.value)
+        address = self.validated_input(
+            Address,
+            "User address, empty to skip: ",
+            allow_empty=True
+        )
+        if address:
+            contact.address = address.value
         email = self.validated_input(
             EmailAddress,
             "User e-mail, empty to skip: ",
             allow_empty=True
         )
+        if email:
+            contact.email = email.value
         birthday = self.validated_input(
             Date,
             "User birthday, empty to skip: ",
             allow_empty=True
         )
-        return f"New user {name} has been added\n"\
-            f"Phone: {phone}\n"\
-            f"E-mail: {email}\n"\
-            f"Birthday: {birthday}"
+        if birthday:
+            contact.birthday = birthday.value
+        return f"New user has been added:\n\n{contact}"
     
     @command_handler("remove", "Remove user from contact book")
     def remove_command(self):
-        return "This is command placeholder"
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        self.contact_book.delete_contact(name.value)
+        return f"User {name.value} has been removed"
+
+    @command_handler("phone add", "Add phone number to existing user")
+    def add_phone_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        phone = self.validated_input(
+            Phone,
+            "User phone: "
+        )
+        contact.add_phone(phone.value)
+        return f"Phone {phone.value} has been added"
     
-    @command_handler("phone", "Add phone number to existing user")
-    def phone_command(self):
-        return "This is command placeholder"
+    @command_handler("phone remove", "Femove phone number from existing user")
+    def rm_phone_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        phone = self.validated_input(
+            Phone,
+            "User phone, empty to skip: ",
+            contact.phones_tuple,
+            allow_empty=True
+        )
+        if phone is None:
+            return "Nothing has been removed"
+        contact.remove_phone(phone.value)
+        return f"Phone {phone.value} has been removed"
     
-    @command_handler("edit", "Edit existing user")
-    def edit_command(self):
-        return "This is command placeholder"
+    @command_handler("phone edit", "Edit existing phone number")
+    def edit_phone_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        phone = self.validated_input(
+            Phone,
+            "User phone, empty to skip: ",
+            contact.phones_tuple,
+            allow_empty=True
+        )
+        if phone is None:
+            return "Nothing has been changed"
+        new_phone = self.validated_input(
+            Phone,
+            "New phone: "
+        )
+        contact.edit_phone(phone.value, new_phone.value)
+        return f"Phone {phone.value} has been changed to {new_phone.value}"
+
+    @command_handler("edit name", "Edit existing user name")
+    def edit_name_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        new_name = self.validated_input(
+            Name,
+            "New user name, empty to skip: ",
+            allow_empty=True
+        )
+        if new_name is None:
+            return "Nothing has been changed"
+        contact.name = new_name.value
+        return f"User name {name.value} has been changed to {new_name.value}"
     
+    @command_handler("address", "Add or overwrite existing user address")
+    def edit_address_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        address = self.validated_input(
+            Address,
+            "User address, empty to skip: ",
+            allow_empty=True
+        )
+        if address is None:
+            return "Nothing has been changed"
+        contact.address = address.value
+        return f"User address has been changed to {address.value}"
+
+    @command_handler("e-mail", "Add or overwrite existing user e-mail")
+    def edit_email_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        email = self.validated_input(
+            EmailAddress,
+            "User e-mail, empty to skip: ",
+            allow_empty=True
+        )
+        if email is None:
+            return "Nothing has been changed"
+        contact.email = email.value
+        return f"User email has been changed to {email.value}"
+    
+    @command_handler("birthday", "Add or overwrite existing user birthday")
+    def edit_birthday_command(self):
+        name = self.validated_input(
+            Name,
+            "User name: ",
+            self.contact_book.names_tuple
+        )
+        contact = self.contact_book.get_contact(name.value)
+        birthday = self.validated_input(
+            Date,
+            "User birthday, empty to skip: ",
+            allow_empty=True
+        )
+        if birthday is None:
+            return "Nothing has been changed"
+        contact.birthday = birthday.value
+        return f"User birthday has been changed to {birthday.value}"
+
     @command_handler("search", "Search by pattern in any record")
     def search_command(self):
-        return "This is command placeholder"
+        pattern = prompt("Search: ").strip()
+        result = self.contact_book.find(pattern)
+        if not result:
+            return "Nothing found"
+        return "\n\n".join(str(contact) for contact in result)
     
     @command_handler("show", "Show all records in contact book")
     def show_command(self):
-        return "\n\n".join(str(contact) for contact in contact_book)
+        return "\n\n".join(
+            str(contact) for contact in self.contact_book.data
+        )
     
     @command_handler("notes show", "Show all notes in notes book")
     def show_notes_command(self):
@@ -264,9 +412,15 @@ class Assistant:
     def sort_command(self):
         return "This is command placeholder"
 
-    @command_handler("birthday", "Birthday persons list to specific date")
+    @command_handler("birthday persons", "Birthday persons list to specific date")
     def birthday_command(self):
-        return "This is command placeholder"
+        days = prompt("Number of days from today: ").strip()
+        if not days.isdigit():
+            raise ValueError("Incorrect input. Should be number.")
+        result = self.contact_book.days_to_birthday(int(days))
+        if not result:
+            return "Nothing found"
+        return "\n\n".join(str(contact) for contact in result)
     
     def main_loop(self):
         print(self.help())
