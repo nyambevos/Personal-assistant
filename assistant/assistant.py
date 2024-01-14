@@ -4,6 +4,7 @@ from prompt_toolkit.completion import WordCompleter
 from colored import Fore, Style
 from assistant.fields import *
 from assistant.records import *
+from assistant.notes_book import NoteBook
 import textwrap
 
 """ Модуль персонального асистента """
@@ -27,7 +28,7 @@ import textwrap
 
 commands = {}
 
-notes_book = [] # remove me!
+tmp_notes_book = [] # remove me!
 
 # remove me too!!!
 note = Note(
@@ -37,7 +38,7 @@ note = Note(
 )
 note.add_tag("Daiquiri")
 note.add_tag("Rum")
-notes_book.append(note)
+tmp_notes_book.append(note)
 
 note = Note(
     "Martini",
@@ -47,7 +48,7 @@ note = Note(
 note.add_tag("Martini")
 note.add_tag("Gin")
 note.add_tag("Vermouth")
-notes_book.append(note)
+tmp_notes_book.append(note)
 
 note = Note(
     "Cosmopolitan",
@@ -57,11 +58,11 @@ note = Note(
 note.add_tag("Cosmopolitan")
 note.add_tag("Vodka")
 
-notes_book.append(note)
+tmp_notes_book.append(note)
 
 
 
-notes_book.append(note)
+# notes_book.append(note)
 
 contact_book=[]
 
@@ -121,6 +122,12 @@ def command_handler(command, description):
 class Assistant:
     def __init__(self) -> None:
         self.running = True
+        self.notes_book = NoteBook()
+
+        #remove me!
+        for note in tmp_notes_book:
+            self.notes_book.add_record(note)
+
 
     @staticmethod
     def validated_input(cls, request, completer = None):
@@ -187,92 +194,80 @@ class Assistant:
     
     @command_handler("notes show", "Show all notes in notes book")
     def show_notes_command(self):
-        if not notes_book:
+        if not self.notes_book.data:
             return "It's empty. There are no any records."
-        return "\n\n".join(str(note) for note in notes_book)
+        return "\n\n".join(str(note) for note in self.notes_book.data)
     
     @command_handler("note add", "Add note to notes book")
     def add_note_command(self):
         title = self.validated_input(Title, "Note title: ")
         text = self.validated_input(Text, "Note text: ")
-
-        tags_autofill = set()
-        for note in notes_book:
-            tags_autofill.update(note.tags_set)
-
-        tag = self.validated_input(Tag, "Note tag: ", tags_autofill)
+        tag = self.validated_input(
+            Tag,
+            "Note tag: ",
+            self.notes_book.notes_tags_set
+        )
         note = Note(title.value, text.value, tag.value)
-        notes_book.append(note)
+        self.notes_book.add_record(note)
         return f"Note with title {title} has been added"
     
     @command_handler("note add tag", "Add tag to note")
     def add_tag_command(self):
-        
-        title_autofill = set()
-        for note in notes_book:
-            title_autofill.add(note.title.value)
-        
-        title = self.validated_input(Title, "Note title: ", title_autofill)
-
-        tags_autofill = set()
-        for note in notes_book:
-            tags_autofill.update(note.tags_set)
-            
-        for note in notes_book:
-            if note.title.value == title.value:
-                break
-
-        tag = self.validated_input(Tag, "Note tag: ", tags_autofill)
+        title = self.validated_input(
+            Title,
+            "Note title: ",
+            self.notes_book.titles_tuple
+        )
+        note = self.notes_book.get_note(title.value)
+        tag = self.validated_input(
+            Tag,
+            "Note tag: ",
+            self.notes_book.notes_tags_set
+        )
         note.add_tag(tag.value)
         return "Note has been updated"
 
     @command_handler("note remove tag", "Remove tag from note")
     def rm_tag_command(self):
-        title_autofill = set()
-        for note in notes_book:
-            title_autofill.add(note.title.value)
-        
-        title = self.validated_input(Title, "Note title: ", title_autofill)
-
-        for note in notes_book:
-            if note.title.value == title.value:
-                break
-
-        tag = self.validated_input(Tag, "Note tag: ", note.tags_set)
+        title = self.validated_input(
+            Title,
+            "Note title: ",
+            self.notes_book.titles_tuple
+        )
+        note = self.notes_book.get_note(title.value)
+        tag = self.validated_input(
+            Tag,
+            "Note tag: ",
+            note.tags_set
+        )
         note.remove_tag(tag.value)
         return "Note has been updated"
     
     @command_handler("note edit tag", "Remove tag from note")
     def rm_tag_command(self):
-        title_autofill = set()
-        for note in notes_book:
-            title_autofill.add(note.title.value)
-        
-        title = self.validated_input(Title, "Note title: ", title_autofill)
-
-        for note in notes_book:
-            if note.title.value == title.value:
-                break
-
+        title = self.validated_input(
+            Title,
+            "Note title: ",
+            self.notes_book.titles_tuple
+        )
+        note = self.notes_book.get_note(title.value)
         tag = self.validated_input(Tag, "Note tag: ", note.tags_set)
-        new_tag = self.validated_input(Tag, "Note tag: ")
+        new_tag = self.validated_input(
+            Tag,
+            "New note tag: ",
+            self.notes_book.notes_tags_set
+        )
         note.change_tag(tag.value, new_tag.value)
         return "Note has been updated"
 
     @command_handler("note remove", "Remove note from notes book")
     def rm_note_command(self):
-        title_autofill = set()
-        for note in notes_book:
-            title_autofill.add(note.title.value)
-        
-        title = self.validated_input(Title, "Note title: ", title_autofill)
-
-        for index, note in enumerate(notes_book):
-            if note.title.value == title.value:
-                break
-        
-        notes_book.pop(index)
-
+        title = self.validated_input(
+            Title,
+            "Note title: ",
+            self.notes_book.titles_tuple
+        )
+        self.notes_book.delete(title.value)
         return f"Note with title {title} has been removed"
         
     
