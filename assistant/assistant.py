@@ -1,7 +1,10 @@
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-from termcolor import colored
+# from termcolor import colored
+from colored import Fore, Style
 from assistant.fields import *
+from assistant.records import *
+import textwrap
 
 """ Модуль персонального асистента """
 
@@ -24,6 +27,70 @@ from assistant.fields import *
 
 commands = {}
 
+notes_book = [] # remove me!
+
+# remove me too!!!
+note = Note(
+    "Daiquiri",
+    "60 ml white Cuban rum, 20 ml fresh lime juice, 2 bar spoons superfine sugar. In a cocktail shaker add all ingredients. Stir well to dissolve the sugar. Add ice and shake. Strain into chilled cocktail glass.",
+    "Cocktail"
+)
+note.add_tag("Daiquiri")
+note.add_tag("Rum")
+notes_book.append(note)
+
+note = Note(
+    "Martini",
+    "60 mL (2.0 US fl oz) gin, 10 mL (0.34 US fl oz) dry vermouth. Pour all ingredients into mixing glass with ice cubes. Stir well. Strain into chilled martini cocktail glass.",
+    "Cocktail"
+)
+note.add_tag("Martini")
+note.add_tag("Gin")
+note.add_tag("Vermouth")
+notes_book.append(note)
+
+note = Note(
+    "Cosmopolitan",
+    "40 ml Vodka Citron, 15 ml Cointreau, 15 ml Fresh lime juice, 30 ml cranberry juice. Shake all ingredients in cocktail shaker filled with ice. Strain into a large cocktail glass. Garnish with lime slice.",
+    "Cocktail"
+)
+note.add_tag("Cosmopolitan")
+note.add_tag("Vodka")
+
+notes_book.append(note)
+
+
+
+notes_book.append(note)
+
+contact_book=[]
+
+contact = Contact("Madilyn")
+contact.add_phone("3569321443")
+contact.add_phone("3605392707")
+contact.add_phone("7922432903")
+contact.birthday = "2002-07-07"
+contact.email = "example@email.com"
+contact.address = "5780 Kozey Garden, West Margeneville, OK 65613"
+contact_book.append(contact)
+
+contact = Contact("Roland")
+contact.add_phone("5246670975")
+contact.add_phone("1662428392")
+contact.birthday = "1993-09-20"
+contact.email = "example2@email.com"
+contact.address = "573 Jones Forest, Port Nelida, AK 66734"
+contact_book.append(contact)
+
+contact = Contact("Julia")
+contact.add_phone("1962802250")
+contact.add_phone("9276019428")
+contact.add_phone("5244315630")
+contact.birthday = "1988-08-26"
+contact.email = "example@email.com"
+contact.address = "Suite 787 7328 Krajcik Bypass, New Jesston, WY 7362-91147"
+contact_book.append(contact)
+
 
 # command handler decorator to handle commands automaticaly
 # usage: @command_handler(command, description)
@@ -44,8 +111,8 @@ def command_handler(command, description):
         def wrapper(self):
             try:
                 return func(self)
-            except ValueError as err:
-                return colored(err, "red")
+            except (ValueError, IndexError) as err:
+                return f"{Fore.red}{err}{Style.reset}"
         commands[command] = (wrapper, description)
         return wrapper
     return input_error
@@ -55,15 +122,17 @@ class Assistant:
     def __init__(self) -> None:
         self.running = True
 
-    def validated_input(self, cls, request):
+    @staticmethod
+    def validated_input(cls, request, completer = None):
+        inp_completer = WordCompleter(completer) if completer else None
         while True:
             try:
-                inp = prompt(request).strip()
+                inp = prompt(request, completer=inp_completer).strip()
                 if not inp:
                     return None
                 return cls(inp)
-            except ValueError as err:
-                print(colored(err, "red"))
+            except (ValueError, IndexError) as err:
+                print(f"{Fore.red}{err}{Style.reset}")
 
     @command_handler("help", "Help")
     def help(self):
@@ -114,15 +183,98 @@ class Assistant:
     
     @command_handler("show", "Show all records in contact book")
     def show_command(self):
-        return "This is command placeholder"
+        return "\n\n".join(str(contact) for contact in contact_book)
     
-    @command_handler("note", "Add note no notes book")
-    def note_command(self):
-        return "This is command placeholder for notes"
+    @command_handler("notes show", "Show all notes in notes book")
+    def show_notes_command(self):
+        if not notes_book:
+            return "It's empty. There are no any records."
+        return "\n\n".join(str(note) for note in notes_book)
     
-    @command_handler("remove note", "Remove note from notes book")
+    @command_handler("note add", "Add note to notes book")
+    def add_note_command(self):
+        title = self.validated_input(Title, "Note title: ")
+        text = self.validated_input(Text, "Note text: ")
+
+        tags_autofill = set()
+        for note in notes_book:
+            tags_autofill.update(note.tags_set)
+
+        tag = self.validated_input(Tag, "Note tag: ", tags_autofill)
+        note = Note(title.value, text.value, tag.value)
+        notes_book.append(note)
+        return f"Note with title {title} has been added"
+    
+    @command_handler("note add tag", "Add tag to note")
+    def add_tag_command(self):
+        
+        title_autofill = set()
+        for note in notes_book:
+            title_autofill.add(note.title.value)
+        
+        title = self.validated_input(Title, "Note title: ", title_autofill)
+
+        tags_autofill = set()
+        for note in notes_book:
+            tags_autofill.update(note.tags_set)
+            
+        for note in notes_book:
+            if note.title.value == title.value:
+                break
+
+        tag = self.validated_input(Tag, "Note tag: ", tags_autofill)
+        note.add_tag(tag.value)
+        return "Note has been updated"
+
+    @command_handler("note remove tag", "Remove tag from note")
+    def rm_tag_command(self):
+        title_autofill = set()
+        for note in notes_book:
+            title_autofill.add(note.title.value)
+        
+        title = self.validated_input(Title, "Note title: ", title_autofill)
+
+        for note in notes_book:
+            if note.title.value == title.value:
+                break
+
+        tag = self.validated_input(Tag, "Note tag: ", note.tags_set)
+        note.remove_tag(tag.value)
+        return "Note has been updated"
+    
+    @command_handler("note edit tag", "Remove tag from note")
+    def rm_tag_command(self):
+        title_autofill = set()
+        for note in notes_book:
+            title_autofill.add(note.title.value)
+        
+        title = self.validated_input(Title, "Note title: ", title_autofill)
+
+        for note in notes_book:
+            if note.title.value == title.value:
+                break
+
+        tag = self.validated_input(Tag, "Note tag: ", note.tags_set)
+        new_tag = self.validated_input(Tag, "Note tag: ")
+        note.change_tag(tag.value, new_tag.value)
+        return "Note has been updated"
+
+    @command_handler("note remove", "Remove note from notes book")
     def rm_note_command(self):
-        return "This is command placeholder for notes"
+        title_autofill = set()
+        for note in notes_book:
+            title_autofill.add(note.title.value)
+        
+        title = self.validated_input(Title, "Note title: ", title_autofill)
+
+        for index, note in enumerate(notes_book):
+            if note.title.value == title.value:
+                break
+        
+        notes_book.pop(index)
+
+        return f"Note with title {title} has been removed"
+        
     
     @command_handler("sort folder", "Smart file sorter")
     def sort_command(self):
@@ -136,7 +288,7 @@ class Assistant:
         print(self.help())
         while self.running:
             command_completer = WordCompleter(commands)
-            command = prompt('>>>', completer=command_completer)
+            command = prompt('>>> ', completer=command_completer)
             command = command.lower().strip()
 
             if command not in commands:
