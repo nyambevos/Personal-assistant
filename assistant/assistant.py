@@ -406,8 +406,19 @@ class Assistant:
         if not result:
             return "Nothing found"
         return "\n\n".join(str(note) for note in result)
-        
     
+    @command_handler("note tag search", "Notes search by tag")
+    def search_note_tag_command(self):
+        tag = self.validated_input(
+            Tag,
+            "Note tag: ",
+            self.notes_book.notes_tags_set
+        )
+        result = self.notes_book.find(tag.value, tag_only=True)
+        if not result:
+            return "Nothing found"
+        return "\n\n".join(str(note) for note in result)
+        
     @command_handler("sort folder", "Smart file sorter")
     def sort_command(self):
         return "This is command placeholder"
