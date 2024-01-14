@@ -244,7 +244,7 @@ class Assistant:
         return "Note has been updated"
     
     @command_handler("note edit tag", "Edit note tag")
-    def rm_tag_command(self):
+    def edit_tag_command(self):
         title = self.validated_input(
             Title,
             "Note title: ",
@@ -271,7 +271,7 @@ class Assistant:
         return f"Note with title {title} has been removed"
     
     @command_handler("note search", "Notes search by pattern")
-    def rm_note_command(self):
+    def search_note_command(self):
         pattern = prompt("Search: ").strip()
         result = self.notes_book.find(pattern)
         if not result:
