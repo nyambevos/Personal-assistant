@@ -29,42 +29,6 @@ from assistant.utils.data_handler import *
 
 commands = {}
 
-tmp_notes_book = [] # remove me!
-
-# remove me too!!!
-note = Note(
-    "Daiquiri",
-    "60 ml white Cuban rum, 20 ml fresh lime juice, 2 bar spoons superfine sugar. In a cocktail shaker add all ingredients. Stir well to dissolve the sugar. Add ice and shake. Strain into chilled cocktail glass.",
-    "Cocktail"
-)
-note.add_tag("Daiquiri")
-note.add_tag("Rum")
-tmp_notes_book.append(note)
-
-note = Note(
-    "Martini",
-    "60 mL (2.0 US fl oz) gin, 10 mL (0.34 US fl oz) dry vermouth. Pour all ingredients into mixing glass with ice cubes. Stir well. Strain into chilled martini cocktail glass.",
-    "Cocktail"
-)
-note.add_tag("Martini")
-note.add_tag("Gin")
-note.add_tag("Vermouth")
-tmp_notes_book.append(note)
-
-note = Note(
-    "Cosmopolitan",
-    "40 ml Vodka Citron, 15 ml Cointreau, 15 ml Fresh lime juice, 30 ml cranberry juice. Shake all ingredients in cocktail shaker filled with ice. Strain into a large cocktail glass. Garnish with lime slice.",
-    "Cocktail"
-)
-note.add_tag("Cosmopolitan")
-note.add_tag("Vodka")
-
-tmp_notes_book.append(note)
-
-
-
-# notes_book.append(note)
-
 contact_book=[]
 
 contact = Contact("Madilyn")
@@ -125,9 +89,9 @@ class Assistant:
         self.running = True
         self.notes_book = NoteBook()
 
-        #remove me!
-        for note in tmp_notes_book:
-            self.notes_book.add_record(note)
+        # remove me!
+        # for note in tmp_notes_book:
+        #     self.notes_book.add_record(note)
 
 
     @staticmethod
@@ -145,7 +109,10 @@ class Assistant:
                 print(f"{Fore.red}{err}{Style.reset}")
 
     def save(self):
-        pass
+        save_data_to_file("notes_book.bin", self.notes_book)
+
+    def load(self):
+        self.notes_book = load_data_from_file("notes_book.bin")
 
     @command_handler("help", "Help")
     def help(self):
@@ -210,7 +177,7 @@ class Assistant:
     def show_notes_command(self):
         if not self.notes_book.data:
             return "It's empty. There are no any records."
-        return "\n\n".join(str(note) for note in self.notes_book.data)
+        return "\n" + "\n\n".join(str(note) for note in self.notes_book.data)
     
     @command_handler("note add", "Add note to notes book")
     def add_note_command(self):
