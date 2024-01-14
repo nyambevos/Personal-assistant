@@ -1,6 +1,8 @@
 """ Модуль роботи з нотаткою """
 
 from datetime import datetime
+import textwrap
+from colored import Fore, Style
 from assistant.fields import Title, Text, Tag, Date
 
 
@@ -37,6 +39,10 @@ class Note:
     @property
     def tags(self) -> set:
         return self._tags
+    
+    @property
+    def tags_set(self) -> set:
+        return set(tag.value for tag in self._tags)
 
 
     def add_tag(self, tag:str) -> None:
@@ -73,3 +79,15 @@ class Note:
             self._tags.append(Tag(new_tag))
         else:
             raise IndexError(f"Tag {old_tag} does not exist")
+        
+    def __str__(self):
+        tags = ', '.join(tuple(tag.value for tag in self.tags))
+        tags = textwrap.wrap((tags))
+        tags = "\n".join(tuple(f"{line: >70}" for line in tags))
+        return f"{Fore.yellow}{str(self.title): <60}{Style.reset}" \
+            f"{Fore.dark_gray}" \
+            f"{self.creation_date.strftime('%d.%m.%Y')}" \
+            f"{Style.reset}\n" \
+            f"{'':-^70}\n" \
+            f"{textwrap.fill(self.text.value)}\n" \
+            f"{Fore.rgb(255, 255, 255)}{tags}{Style.reset}\n"
