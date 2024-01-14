@@ -58,3 +58,14 @@ class NoteBook(UserList):
         while index < len(self.data):
             yield self.data[index:index + amount]
             index += amount
+
+    @property
+    def notes_tags_set(self):
+        tags = set()
+        for note in self.data:
+            tags.update(note.tags_set)
+        return tags
+
+    @property
+    def titles_tuple(self):
+        return tuple(note.title.value for note in self.data)
