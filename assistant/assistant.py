@@ -172,7 +172,7 @@ class Assistant:
             contact.email = email.value
         birthday = self.validated_input(
             Date,
-            "User birthday, empty to skip: ",
+            "User birthday in YYYY-MM-DD format, empty to skip: ",
             allow_empty=True
         )
         if birthday:
@@ -310,7 +310,7 @@ class Assistant:
         contact = self.contact_book.get_contact(name.value)
         birthday = self.validated_input(
             Date,
-            "User birthday, empty to skip: ",
+            "User birthday in YYYY-MM-DD format, empty to skip: ",
             allow_empty=True
         )
         if birthday is None:
