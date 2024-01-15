@@ -1,3 +1,4 @@
+from pathlib import Path
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 # from termcolor import colored
@@ -7,6 +8,7 @@ from assistant.records import *
 from assistant.notes_book import NoteBook
 from assistant.contact_book import ContactBook
 from assistant.utils.data_handler import *
+from assistant.file_sorter import init_folder
 # import textwrap
 
 """ Модуль персонального асистента """
@@ -421,7 +423,21 @@ class Assistant:
         
     @command_handler("sort folder", "Smart file sorter")
     def sort_command(self):
-        return "This is command placeholder"
+        path = Path()
+        dir_list = filter(lambda dir: dir.is_dir(), path.iterdir())
+        dir_list = tuple(dirs.stem for dirs in dir_list)
+        print(dir_list)
+        dir_path = self.validated_input(
+            Path,
+            "Path to folder, empty to skip: ",
+            dir_list,
+            allow_empty=True
+        )
+        if dir_path is None:
+            return "Nothing has been changed"
+        init_folder(dir_path.absolute())
+        return f"Folder {dir_path.absolute()} has been sorted"
+
 
     @command_handler("birthday persons", "Birthday persons list to specific date")
     def birthday_command(self):
