@@ -1,7 +1,6 @@
 from pathlib import Path
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-# from termcolor import colored
 from colored import Fore, Style
 from assistant.fields import *
 from assistant.records import *
@@ -9,15 +8,19 @@ from assistant.notes_book import NoteBook
 from assistant.contact_book import ContactBook
 from assistant.utils.data_handler import *
 from assistant.file_sorter import init_folder
-# import textwrap
+
 
 """ Модуль персонального асистента """
 
 """
 “Персональний помічник” повинен вміти:
-зберігати контакти з іменами, адресами, номерами телефонів, email та днями народження до книги контактів;
-виводити список контактів, у яких день народження через задану кількість днів від поточної дати;
-перевіряти правильність введеного номера телефону та email під час створення або редагування запису та повідомляти користувача у разі некоректного введення;
+зберігати контакти з іменами, адресами, номерами телефонів, email та днями
+народження до книги контактів;
+виводити список контактів, у яких день народження через задану кількість
+днів від поточної дати;
+перевіряти правильність введеного номера телефону та email під час створення
+або редагування
+запису та повідомляти користувача у разі некоректного введення;
 здійснювати пошук контактів серед контактів книги;
 редагувати та видаляти записи з книги контактів;
 зберігати нотатки з текстовою інформацією;
@@ -25,40 +28,12 @@ from assistant.file_sorter import init_folder
 редагувати та видаляти нотатки;
 додавати в нотатки "теги", ключові слова, що описують тему та предмет запису;
 здійснювати пошук та сортування нотаток за ключовими словами (тегами);
-сортувати файли у зазначеній папці за категоріями (зображення, документи, відео та ін.).
+сортувати файли у зазначеній папці за категоріями (зображення, документи,
+відео та ін.).
 
 """
 
-
 commands = {}
-
-tmp_contact_book=[]
-
-contact = Contact("Madilyn")
-contact.add_phone("3569321443")
-contact.add_phone("3605392707")
-contact.add_phone("7922432903")
-contact.birthday = "2002-07-07"
-contact.email = "example@email.com"
-contact.address = "5780 Kozey Garden, West Margeneville, OK 65613"
-tmp_contact_book.append(contact)
-
-contact = Contact("Roland")
-contact.add_phone("5246670975")
-contact.add_phone("1662428392")
-contact.birthday = "1993-09-20"
-contact.email = "example2@email.com"
-contact.address = "573 Jones Forest, Port Nelida, AK 66734"
-tmp_contact_book.append(contact)
-
-contact = Contact("Julia")
-contact.add_phone("1962802250")
-contact.add_phone("9276019428")
-contact.add_phone("5244315630")
-contact.birthday = "1988-08-26"
-contact.email = "example3@email.com"
-contact.address = "Suite 787 7328 Krajcik Bypass, New Jesston, WY 7362-91147"
-tmp_contact_book.append(contact)
 
 
 # command handler decorator to handle commands automaticaly
@@ -93,14 +68,13 @@ class Assistant:
         self.contact_book = ContactBook()
         self.notes_book = NoteBook()
 
-        # remove me!
-        for contact in tmp_contact_book:
-            self.contact_book.add_contact(contact)
-        
-        print(self.contact_book)
-
     @staticmethod
-    def validated_input(cls, request, completer = None, allow_empty = False):
+    def validated_input(
+        verify_cls,
+        request,
+        completer=None,
+        allow_empty=False
+    ):
         inp_completer = WordCompleter(completer) if completer else None
         while True:
             try:
@@ -109,15 +83,17 @@ class Assistant:
                     return None
                 if not inp:
                     raise ValueError("Input can't be empty")
-                return cls(inp)
+                return verify_cls(inp)
             except (ValueError, IndexError) as err:
                 print(f"{Fore.red}{err}{Style.reset}")
 
     def save(self):
         save_data_to_file("notes_book.bin", self.notes_book)
+        save_data_to_file("contact_book.bin", self.contact_book)
 
     def load(self):
         self.notes_book = load_data_from_file("notes_book.bin")
+        self.contact_book = load_data_from_file("contact_book.bin")
 
     @command_handler("help", "Help")
     def help(self):
@@ -130,6 +106,18 @@ class Assistant:
         return "\n".join(
             f"{command: <17}{val[1]}" for command, val in commands.items()
         )
+
+    @command_handler("about", "About this application")
+    def about(self):
+        return f"{Fore.rgb(255, 255, 255)}This console program "\
+            "is a fast and easy to use personal assisstant stores your "\
+            f"contacts and notes.{Style.reset}\n\n"\
+            f"{Fore.yellow}Contributors:{Style.reset}\n"\
+            "Ruslan Bilokoniuk aka Nyambevos - Team Lead\n"\
+            "Andrii Trebukh - Scrum Master\n"\
+            "Олена Сазонець\n"\
+            "Olha Lialina\n"\
+            "Eugene Vlasenko\n\n"
 
     @command_handler("exit", "Exit")
     def exit_command(self):
@@ -169,7 +157,7 @@ class Assistant:
         if birthday:
             contact.birthday = birthday.value
         return f"New user has been added:\n\n{contact}"
-    
+
     @command_handler("remove", "Remove user from contact book")
     def remove_command(self):
         name = self.validated_input(
@@ -194,7 +182,7 @@ class Assistant:
         )
         contact.add_phone(phone.value)
         return f"Phone {phone.value} has been added"
-    
+
     @command_handler("phone remove", "Femove phone number from existing user")
     def rm_phone_command(self):
         name = self.validated_input(
@@ -213,7 +201,7 @@ class Assistant:
             return "Nothing has been removed"
         contact.remove_phone(phone.value)
         return f"Phone {phone.value} has been removed"
-    
+
     @command_handler("phone edit", "Edit existing phone number")
     def edit_phone_command(self):
         name = self.validated_input(
@@ -254,7 +242,7 @@ class Assistant:
             return "Nothing has been changed"
         contact.name = new_name.value
         return f"User name {name.value} has been changed to {new_name.value}"
-    
+
     @command_handler("address", "Add or overwrite existing user address")
     def edit_address_command(self):
         name = self.validated_input(
@@ -290,7 +278,7 @@ class Assistant:
             return "Nothing has been changed"
         contact.email = email.value
         return f"User email has been changed to {email.value}"
-    
+
     @command_handler("birthday", "Add or overwrite existing user birthday")
     def edit_birthday_command(self):
         name = self.validated_input(
@@ -316,19 +304,19 @@ class Assistant:
         if not result:
             return "Nothing found"
         return "\n\n".join(str(contact) for contact in result)
-    
+
     @command_handler("show", "Show all records in contact book")
     def show_command(self):
         return "\n\n".join(
             str(contact) for contact in self.contact_book.data
         )
-    
+
     @command_handler("notes show", "Show all notes in notes book")
     def show_notes_command(self):
         if not self.notes_book.data:
             return "It's empty. There are no any records."
         return "\n" + "\n\n".join(str(note) for note in self.notes_book.data)
-    
+
     @command_handler("note add", "Add note to notes book")
     def add_note_command(self):
         title = self.validated_input(Title, "Note title: ")
@@ -341,7 +329,7 @@ class Assistant:
         note = Note(title.value, text.value, tag.value)
         self.notes_book.add_record(note)
         return f"Note with title {title} has been added"
-    
+
     @command_handler("note add tag", "Add tag to note")
     def add_tag_command(self):
         title = self.validated_input(
@@ -373,7 +361,7 @@ class Assistant:
         )
         note.remove_tag(tag.value)
         return "Note has been updated"
-    
+
     @command_handler("note edit tag", "Edit note tag")
     def edit_tag_command(self):
         title = self.validated_input(
@@ -400,7 +388,7 @@ class Assistant:
         )
         self.notes_book.delete(title.value)
         return f"Note with title {title} has been removed"
-    
+
     @command_handler("note search", "Notes search by pattern")
     def search_note_command(self):
         pattern = prompt("Search: ").strip()
@@ -408,7 +396,7 @@ class Assistant:
         if not result:
             return "Nothing found"
         return "\n\n".join(str(note) for note in result)
-    
+
     @command_handler("note tag search", "Notes search by tag")
     def search_note_tag_command(self):
         tag = self.validated_input(
@@ -420,13 +408,12 @@ class Assistant:
         if not result:
             return "Nothing found"
         return "\n\n".join(str(note) for note in result)
-        
+
     @command_handler("sort folder", "Smart file sorter")
     def sort_command(self):
         path = Path()
         dir_list = filter(lambda dir: dir.is_dir(), path.iterdir())
         dir_list = tuple(dirs.stem for dirs in dir_list)
-        print(dir_list)
         dir_path = self.validated_input(
             Path,
             "Path to folder, empty to skip: ",
@@ -438,8 +425,10 @@ class Assistant:
         init_folder(dir_path.absolute())
         return f"Folder {dir_path.absolute()} has been sorted"
 
-
-    @command_handler("birthday persons", "Birthday persons list to specific date")
+    @command_handler(
+            "birthday persons",
+            "Birthday persons list to specific date"
+    )
     def birthday_command(self):
         days = prompt("Number of days from today: ").strip()
         if not days.isdigit():
@@ -448,16 +437,14 @@ class Assistant:
         if not result:
             return "Nothing found"
         return "\n\n".join(str(contact) for contact in result)
-    
+
     def main_loop(self):
-        print(self.help())
+        print(f"\n{self.help()}")
         while self.running:
             command_completer = WordCompleter(commands)
             command = prompt('>>> ', completer=command_completer)
             command = command.lower().strip()
-
             if command not in commands:
                 print("No such command")
                 continue
-
             print(commands[command][0](self))
