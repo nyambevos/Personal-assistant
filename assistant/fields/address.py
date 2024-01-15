@@ -1,5 +1,3 @@
-""" Модуль поля адреси """
-
 import re
 from assistant.fields import Field
 

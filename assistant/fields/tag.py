@@ -1,5 +1,3 @@
-""" Модуль поля тега """
-
 import re
 from assistant.fields import Field
 
