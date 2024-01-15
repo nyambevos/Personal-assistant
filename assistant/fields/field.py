@@ -1,9 +1,7 @@
-""" Модуль поля """
-
 class Field:
     """ This class accepts the value value, checks
-      it using the is_value method, and if the value 
-      passes the check, the value is written to the 
+      it using the is_value method, and if the value
+      passes the check, the value is written to the
       _value class field. """
 
     def __init__(self, value):
@@ -23,6 +21,6 @@ class Field:
 
     def is_valid(self, value):
         """ This method performs a value check, and
-        if the check is successful, returns True, and 
+        if the check is successful, returns True, and
         if not, throws an exception of type ValueError """
         return True

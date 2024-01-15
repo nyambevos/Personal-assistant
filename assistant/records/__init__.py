@@ -1,2 +1,2 @@
-from assistant.records.contact import *
-from assistant.records.note import *
+from assistant.records.contact import Contact
+from assistant.records.note import Note
