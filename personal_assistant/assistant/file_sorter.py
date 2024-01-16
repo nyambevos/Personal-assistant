@@ -18,14 +18,11 @@ def init_folder(val):
     main()
 def main():
     global folder, folders_absolute
-    try:        
-        if not folder.exists():                               # Перевірка чи існує папка           
-            raise FileNotFoundError        
-    except FileNotFoundError:
-        return 'Error. Folder not found'       
-    else:
+    if folder.is_dir():
         print(f"\nSort files in a folder {folder}\n")
-    
+    else:
+        raise FileNotFoundError(f"Folder {folder.name} not found")
+
     folder_absolute = folder.absolute()         # створення абсолютного шляху для папки
     
     for i in folders:                       # Створення абсолютних шляхів для папок категорій
