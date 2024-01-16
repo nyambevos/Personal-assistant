@@ -424,7 +424,7 @@ class Assistant:
         )
         if dir_path is None:
             return "Nothing has been changed"
-        init_folder(dir_path.absolute())
+        init_folder(dir_path)
         return f"Folder {dir_path.absolute()} has been sorted"
 
     @command_handler(
