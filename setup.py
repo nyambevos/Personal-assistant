@@ -7,6 +7,7 @@ setup(name='personal-assistant',
       author='Daiquiri Club',
       author_email='daiquiri_club@team.com',
       license='MIT',
+      packages=find_namespace_packages(),
       entry_points = {'console_scripts': ['assistantdc=personal_assistant.main:main'],},
       install_requires=['colored==2.2.4', 'prompt-toolkit==3.0.43', 'wcwidth==0.2.13'],
       )
