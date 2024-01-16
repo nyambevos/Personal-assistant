@@ -32,6 +32,6 @@ pip install -r requirements.txt
 
 ## Start the program
 
-python3 personal_assistant/main.py
+```python3 personal_assistant/main.py```
 ### or
-python personal_assistant/main.py
+```python personal_assistant/main.py```
