@@ -29,3 +29,9 @@ git clone https://github.com/Nyambevos/Personal-assistant.git
 ## Installation dependencies
 
 pip install -r requirements.txt
+
+## Start the program
+
+python3 personal_assistant/main.py
+### or
+python personal_assistant/main.py
