@@ -1,4 +1,4 @@
-from assistant.fields import Field
+from . import Field
 
 
 class Text(Field):

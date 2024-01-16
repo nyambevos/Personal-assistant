@@ -1,5 +1,5 @@
 from collections import UserList
-from assistant.records import Note
+from .records import Note
 
 
 class NoteBook(UserList):
