@@ -1,6 +1,5 @@
-""" Модуль поля телефонів """
+from . import Field
 
-from assistant.fields import Field
 
 class Phone(Field):
     def is_valid(self, value):

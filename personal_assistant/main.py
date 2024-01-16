@@ -1,6 +1,4 @@
-""" Файл запуску програми"""
-
-from assistant.assistant import Assistant
+from .assistant import Assistant
 
 NICE_LOGO = r"""
 ______      _                  _   _____ _       _

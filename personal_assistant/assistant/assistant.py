@@ -1,37 +1,17 @@
 from pathlib import Path
+from pickle import UnpicklingError
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from colored import Fore, Style
-from assistant.fields import *
-from assistant.records import *
-from assistant.notes_book import NoteBook
-from assistant.contact_book import ContactBook
-from assistant.utils.data_handler import *
-from assistant.file_sorter import init_folder
+from .fields import Address, Date, EmailAddress
+from .fields import Name, Phone, Tag, Text, Title
+from .records import Contact, Note
+from .notes_book import NoteBook
+from .contact_book import ContactBook
+from .utils.data_handler import save_data_to_file
+from .utils.data_handler import load_data_from_file
+from .file_sorter import init_folder
 
-
-""" Модуль персонального асистента """
-
-"""
-“Персональний помічник” повинен вміти:
-зберігати контакти з іменами, адресами, номерами телефонів, email та днями
-народження до книги контактів;
-виводити список контактів, у яких день народження через задану кількість
-днів від поточної дати;
-перевіряти правильність введеного номера телефону та email під час створення
-або редагування
-запису та повідомляти користувача у разі некоректного введення;
-здійснювати пошук контактів серед контактів книги;
-редагувати та видаляти записи з книги контактів;
-зберігати нотатки з текстовою інформацією;
-проводити пошук за нотатками;
-редагувати та видаляти нотатки;
-додавати в нотатки "теги", ключові слова, що описують тему та предмет запису;
-здійснювати пошук та сортування нотаток за ключовими словами (тегами);
-сортувати файли у зазначеній папці за категоріями (зображення, документи,
-відео та ін.).
-
-"""
 
 commands = {}
 
@@ -55,7 +35,7 @@ def command_handler(command, description):
         def wrapper(self):
             try:
                 return func(self)
-            except (ValueError, IndexError) as err:
+            except (ValueError, IndexError, FileNotFoundError) as err:
                 return f"{Fore.red}{err}{Style.reset}"
         commands[command] = (wrapper, description)
         return wrapper
@@ -88,12 +68,32 @@ class Assistant:
                 print(f"{Fore.red}{err}{Style.reset}")
 
     def save(self):
-        save_data_to_file("notes_book.bin", self.notes_book)
-        save_data_to_file("contact_book.bin", self.contact_book)
+        dir_path = Path.home().joinpath(".personal_assistant")
+        if not dir_path.exists():
+            dir_path.mkdir()
+        save_data_to_file(
+            dir_path.joinpath("contact_book.bin"),
+            self.contact_book
+        )
+        save_data_to_file(
+            dir_path.joinpath("notes_book.bin"),
+            self.notes_book
+        )
 
     def load(self):
-        self.notes_book = load_data_from_file("notes_book.bin")
-        self.contact_book = load_data_from_file("contact_book.bin")
+        dir_path = Path.home().joinpath(".personal_assistant")
+        try:
+            self.contact_book = load_data_from_file(
+                dir_path.joinpath("contact_book.bin")
+            )
+        except (UnpicklingError, FileNotFoundError):
+            pass
+        try:
+            self.notes_book = load_data_from_file(
+                dir_path.joinpath("notes_book.bin")
+            )
+        except (UnpicklingError, FileNotFoundError):
+            pass
 
     @command_handler("help", "Help")
     def help(self):
@@ -109,15 +109,15 @@ class Assistant:
 
     @command_handler("about", "About this application")
     def about(self):
-        return f"{Fore.rgb(255, 255, 255)}This console program "\
-            "is a fast and easy to use personal assisstant stores your "\
-            f"contacts and notes.{Style.reset}\n\n"\
+        return f"\n{Fore.rgb(255, 255, 255)}This console program "\
+            "is a fast and easy to use personal assisstant to store"\
+            f"your contacts and notes.{Style.reset}\n\n"\
             f"{Fore.yellow}Contributors:{Style.reset}\n"\
             "Ruslan Bilokoniuk aka Nyambevos - Team Lead\n"\
             "Andrii Trebukh - Scrum Master\n"\
             "Олена Сазонець\n"\
             "Olha Lialina\n"\
-            "Eugene Vlasenko\n\n"
+            "Eugene Vlasenko\n"
 
     @command_handler("exit", "Exit")
     def exit_command(self):
@@ -151,7 +151,7 @@ class Assistant:
             contact.email = email.value
         birthday = self.validated_input(
             Date,
-            "User birthday, empty to skip: ",
+            "User birthday in YYYY-MM-DD format, empty to skip: ",
             allow_empty=True
         )
         if birthday:
@@ -289,7 +289,7 @@ class Assistant:
         contact = self.contact_book.get_contact(name.value)
         birthday = self.validated_input(
             Date,
-            "User birthday, empty to skip: ",
+            "User birthday in YYYY-MM-DD format, empty to skip: ",
             allow_empty=True
         )
         if birthday is None:
@@ -307,7 +307,9 @@ class Assistant:
 
     @command_handler("show", "Show all records in contact book")
     def show_command(self):
-        return "\n\n".join(
+        if not self.contact_book.data:
+            return "It's empty. There are no any records."
+        return "\n" + "\n\n".join(
             str(contact) for contact in self.contact_book.data
         )
 
