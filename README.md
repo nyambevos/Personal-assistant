@@ -22,16 +22,31 @@ Search and sort notes based on keywords.
 Organize files (images, documents, audio, video, archives, other).
 Rename files for compatibility and remove empty folders.
 
-## Installation
+### Download the application code
 
-git clone https://github.com/Nyambevos/Personal-assistant.git
+```git clone https://github.com/Nyambevos/Personal-assistant.git```
 
-## Installation dependencies
+### Installation dependencies
 
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 
-## Start the program
+### Start the program
 
 ```python3 personal_assistant/main.py```
-### or
+##### or
 ```python personal_assistant/main.py```
+
+
+## Install as a command line application
+
+### Download the application code
+
+```git clone https://github.com/Nyambevos/Personal-assistant.git```
+
+## Install application
+
+```pip3 install .```
+##### or
+```pip install .```
+
+
