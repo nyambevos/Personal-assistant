@@ -1,7 +1,7 @@
 from datetime import datetime
 import textwrap
 from colored import Fore, Style
-from assistant.fields import Title, Text, Tag, Date
+from ..fields import Title, Text, Tag, Date
 
 
 class Note:

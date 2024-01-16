@@ -1,5 +1,5 @@
 import re
-from assistant.fields import Field
+from . import Field
 
 
 # The tag should not be too long.

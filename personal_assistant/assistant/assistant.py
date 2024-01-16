@@ -2,14 +2,14 @@ from pathlib import Path
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from colored import Fore, Style
-from assistant.fields import Address, Date, EmailAddress
-from assistant.fields import Name, Phone, Tag, Text, Title
-from assistant.records import Contact, Note
-from assistant.notes_book import NoteBook
-from assistant.contact_book import ContactBook
-from assistant.utils.data_handler import save_data_to_file
-from assistant.utils.data_handler import load_data_from_file
-from assistant.file_sorter import init_folder
+from .fields import Address, Date, EmailAddress
+from .fields import Name, Phone, Tag, Text, Title
+from .records import Contact, Note
+from .notes_book import NoteBook
+from .contact_book import ContactBook
+from .utils.data_handler import save_data_to_file
+from .utils.data_handler import load_data_from_file
+from .file_sorter import init_folder
 
 
 commands = {}
