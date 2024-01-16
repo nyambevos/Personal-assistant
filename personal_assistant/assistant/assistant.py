@@ -86,13 +86,13 @@ class Assistant:
             self.contact_book = load_data_from_file(
                 dir_path.joinpath("contact_book.bin")
             )
-        except (UnpicklingError, FileNotFoundError):
+        except (UnpicklingError, FileNotFoundError, ModuleNotFoundError):
             pass
         try:
             self.notes_book = load_data_from_file(
                 dir_path.joinpath("notes_book.bin")
             )
-        except (UnpicklingError, FileNotFoundError):
+        except (UnpicklingError, FileNotFoundError, ModuleNotFoundError):
             pass
 
     @command_handler("help", "Help")
@@ -131,7 +131,7 @@ class Assistant:
         self.contact_book.add_contact(contact)
         phone = self.validated_input(
             Phone,
-            "User phone, empty to skip: ",
+            "User phone in 10 digits format, empty to skip: ",
             allow_empty=True)
         if phone:
             contact.add_phone(phone.value)
@@ -178,7 +178,7 @@ class Assistant:
         contact = self.contact_book.get_contact(name.value)
         phone = self.validated_input(
             Phone,
-            "User phone: "
+            "User phone in 10 digits format: "
         )
         contact.add_phone(phone.value)
         return f"Phone {phone.value} has been added"
@@ -220,7 +220,7 @@ class Assistant:
             return "Nothing has been changed"
         new_phone = self.validated_input(
             Phone,
-            "New phone: "
+            "New phone in 10 digits format: "
         )
         contact.edit_phone(phone.value, new_phone.value)
         return f"Phone {phone.value} has been changed to {new_phone.value}"

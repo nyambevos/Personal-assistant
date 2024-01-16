@@ -1,4 +1,7 @@
-from .assistant import Assistant
+if __package__ is None or __package__ == '':
+    from assistant.assistant import Assistant
+else:
+    from .assistant import Assistant
 
 NICE_LOGO = r"""
 ______      _                  _   _____ _       _
