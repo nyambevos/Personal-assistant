@@ -1,9 +1,6 @@
-""" Модуль роботи з контактом """
-
-
 from colored import Fore, Style
-from assistant.fields import Address, Date
-from assistant.fields import EmailAddress, Name, Phone
+from ..fields import Address, Date
+from ..fields import EmailAddress, Name, Phone
 
 
 class Contact:

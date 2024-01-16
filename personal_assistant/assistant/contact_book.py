@@ -1,6 +1,3 @@
-""" Модуль роботи з книгою контактів """
-
-
 from collections import UserList
 from datetime import date, datetime, timedelta
 
@@ -74,11 +71,17 @@ class ContactBook(UserList):
         matching_contacts = []
 
         for contact in self.data:
-            if (contact.name.value and key_word in contact.name.value) or (
-                    contact.address and key_word in contact.address.value) or (
-                    contact.email and key_word in contact.email.value) or (
-                    contact.birthday and key_word in contact.birthday.value) or any(
-                    phone.value and key_word in phone.value for phone in contact.phones):
+            if (contact.name.value and key_word
+                in contact.name.value) or (
+                    contact.address and key_word
+                    in contact.address.value) or (
+                    contact.email and key_word
+                    in contact.email.value) or (
+                    contact.birthday and key_word
+                    in contact.birthday.value) or any(
+                    phone.value and key_word
+                    in phone.value for phone
+                    in contact.phones):
                 matching_contacts.append(contact)
 
         return matching_contacts

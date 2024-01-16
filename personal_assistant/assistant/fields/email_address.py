@@ -1,7 +1,5 @@
-""" Модуль поля Email """
-
 import re
-from assistant.fields import Field
+from . import Field
 
 
 class EmailAddress(Field):
