@@ -22,6 +22,11 @@ Search and sort notes based on keywords.
 Organize files (images, documents, audio, video, archives, other).
 Rename files for compatibility and remove empty folders.
 
+
+<img width="643" alt="Знімок екрана 2024-01-16 о 22 14 13" src="https://github.com/Nyambevos/Personal-assistant/assets/145774512/ec519c24-f62c-4c02-985f-970386085a21">
+
+
+
 ## Download and run the source code
 
 ### Download the application code
@@ -55,7 +60,34 @@ Rename files for compatibility and remove empty folders.
 ### Run the application
 ```assistantdc```
 
-<img width="643" alt="Знімок екрана 2024-01-16 о 22 14 13" src="https://github.com/Nyambevos/Personal-assistant/assets/145774512/ec519c24-f62c-4c02-985f-970386085a21">
+
+## Commands available
+
+`help`             Help
+`list `            List all commands
+`about`            About this application
+`exit`             Exit
+`add`              Add new user to contact book
+`remove`           Remove user from contact book
+`phone add`        Add phone number to existing user
+`phone remove`     Femove phone number from existing user
+`phone edit`       Edit existing phone number
+`edit name`        Edit existing user name
+`address`          Add or overwrite existing user address
+`e-mail`           Add or overwrite existing user e-mail
+`birthday`         Add or overwrite existing user birthday
+`search`           Search by pattern in any record
+`show`             Show all records in contact book
+`notes show`       Show all notes in notes book
+`note add`         Add note to notes book
+`note add tag`     Add tag to note
+`note remove tag`  Remove tag from note
+`note edit tag`    Edit note tag
+`note remove`      Remove note from notes book
+`note search`      Notes search by pattern
+`note tag search`  Notes search by tag
+`sort folder`      Smart file sorter
+`birthday persons` Birthday persons list to specific date
 
 
 
