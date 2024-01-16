@@ -55,7 +55,8 @@ Rename files for compatibility and remove empty folders.
 ### Run the application
 ```assistantdc```
 
-<img width="656" alt="Знімок екрана 2024-01-16 о 22 08 39" src="https://github.com/Nyambevos/Personal-assistant/assets/145774512/f21346f6-fca3-4bad-89e9-b2e6e757007b">
+<img width="643" alt="Знімок екрана 2024-01-16 о 22 14 13" src="https://github.com/Nyambevos/Personal-assistant/assets/145774512/ec519c24-f62c-4c02-985f-970386085a21">
+
 
 
 
